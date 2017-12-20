@@ -6,7 +6,7 @@ Common practice is to have a file in the following structure:
 
 ```go
 
-type Behavior interface {
+type API interface {
 	Func1(arg1 string, arg2 int) (*Result, error)
 	Func2()
 	...
