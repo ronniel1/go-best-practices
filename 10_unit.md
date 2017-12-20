@@ -30,19 +30,23 @@ type Config struct {
 type Unit struct {
 	Config
 
-    // Unit's state.
-    blocks chan<-uint
+	// Unit's state.
+	blocks chan<-uint
 }
 
 // New returns the unit that exposed by this file (or package).
 //
 // Other units that depend on the behavior, may use its interface on
 // their dependency list (like the config struct above).
-func New(c Config) *Unit {
-    // Validate requirements, or use default values.
+func New(c Config) (*Unit, error) {
+	// Validate requirements, or use default values.
+	if c.C1 == nil {
+		return nil, fmt.Errorf("must give client1")
+	}
+	// Return the constructed type
 	return &Unit{
-        Config: Config
-        blocks: make(chan uint),
-    }
+		Config: Config
+		blocks: make(chan uint),
+	}, nil
 }
 ```
