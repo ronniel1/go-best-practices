@@ -4,7 +4,7 @@ To accomplish that, it may uses (depends) on zero or more units.
 
 Common practice is to have a file in the following structure:
 
-```
+```go
 
 type Behavior interface {
 	Func1(arg1 string, arg2 int) (*Result, error)
@@ -17,11 +17,11 @@ type Config struct {
 	// config members should be either interfaces, not concrete struct with functions:
 	C1 client1.Client
 	C2 client2.Client
-  
+
 	// or configuration variables, with no functionalities.
 	Timeout time.Duration
-  
-	// Logger is also a dependecy. 
+
+	// Logger is also a dependecy.
 	Log log.Logger
 }
 
