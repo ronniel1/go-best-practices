@@ -26,25 +26,25 @@ type Config struct {
 }
 
 
-// Unit is a unit that implements the interface above and uses the Config to do so.
-type Unit struct {
+// unit is a unit that implements the interface above and uses the Config to do so.
+type unit struct {
 	Config
 
-	// Unit's state.
+	// unit's state.
 	blocks chan<-uint
 }
 
 // New returns the unit that exposed by this file (or package).
 //
-// Other units that depend on the behavior, may use its interface on
+// Other units that depend on this behavior, may use its interface on
 // their dependency list (like the config struct above).
-func New(c Config) (*Unit, error) {
+func New(c Config) (API, error) {
 	// Validate requirements, or use default values.
 	if c.C1 == nil {
 		return nil, fmt.Errorf("must give client1")
 	}
 	// Return the constructed type
-	return &Unit{
+	return &unit{
 		Config: Config
 		blocks: make(chan uint),
 	}, nil
