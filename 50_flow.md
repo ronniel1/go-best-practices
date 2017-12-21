@@ -59,8 +59,8 @@ default:
 Cheaper and safer than using `map[string]interface{}`.
 ```go
 games1 := map[string]Game{
-  "dino": dino.New(),
-  "snake": snake.New(),
+  "dino":   dino.New(),
+  "snake":  snake.New(),
   "tetris": tetris.New(),
 }
 
@@ -68,9 +68,9 @@ games1 := map[string]Game{
 games2 := struct{
   Dino, Snake, Tetris Game
 }{
-  dino.New(),
-  snake.New(),
-  tetris.New(),
+  Dino:   dino.New(),
+  Snake:  snake.New(),
+  Tetris: tetris.New(),
 }
 
 games1["tetris"].Play() // :(
