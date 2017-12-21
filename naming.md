@@ -118,7 +118,7 @@ func UserIDByEmail(ctx context.Context, email string) (int64, error) {}
   package httputil  // good
   ```
 
-#### Useful links
+#### Credit and links
 - https://talks.golang.org/2014/names.slide#1
 - https://blog.golang.org/package-names
 - https://rakyll.org/style-packages/
