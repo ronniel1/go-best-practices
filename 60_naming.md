@@ -56,6 +56,12 @@ func (b *Buffer) Read(p []byte) (n int, err error) {}                 // good
 func (sh serverHandler) ServeHTTP(rw ResponseWriter, req *Request) {} // good
 ```
 
+### Constants
+```go
+const PI = 3.14 // bad
+const Pi = 3.14 // good
+```
+
 ### Errors
 Errors
 Error types should be of the form FooError:
