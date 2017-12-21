@@ -28,7 +28,7 @@ u1.AssertExpectations(t)
 Since we are using "dependency injection", another unit (`unit2`) gets `unit1` in it's config, and in it's unittests
 it could get a mock:
 
-In unit2 package:
+In `unit2` package:
 ```go
 u1 := new(unit1.MockAPI)
 u1.On("Func1").Return().Once()
