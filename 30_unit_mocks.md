@@ -20,8 +20,23 @@ This will generate a file named mock_API.go with a struct `MockAPI`, which is ex
 Other packages which use the `unit.API` interface can use this mock in their unittests:
 
 ```go
-u := new(unit.MockAPI)
-u.On("Func1").Return().Once()
+u1 := new(unit1.MockAPI)
+u1.On("Func1").Return().Once()
 // ...
+u1.AssertExpectations(t)
+```
+Since we are using "dependency injection", another unit (`unit2`) gets `unit1` in it's config, and in it's unittests
+it could get a mock:
+
+In unit2 package:
+```go
+u1 := new(unit1.MockAPI)
+u1.On("Func1").Return().Once()
+
+u2 := New(Config{U1: u1})
+
+got := u2.Func1()
+assert.Equal(t, want, got)
+
 u.AssertExpectations(t)
 ```
