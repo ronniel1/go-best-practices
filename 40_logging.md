@@ -19,7 +19,7 @@ Maybe leave only the basic configuration in the library.
   - Arguments, configurations
   - Content of requests, files
   
-* DON'T LOG ERROR AND THEN RETURN IT. Errors should be "treated once!"
+### DON'T LOG ERROR AND THEN RETURN IT. Errors should be "treated once!"
 
 Thats wrong:
 
