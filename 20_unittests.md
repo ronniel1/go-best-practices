@@ -50,11 +50,16 @@ func TestModule_Func1(testing *t.T) {
 				tt.prepare(c1, c2)
 			}
 			
+			log := log.New("test")
+			if !t.Verbose() {
+				log.Out = ioutil.Discard
+			}
+			
 			// create Module
 			m, err := New(&Config{
+				Log:     log,
 				Client1: c1,
 				Client2: c2,
-				Log: log.New("test")
 			})
 			require.Nil(t, err) // notice require and not assert - will fail the test immediatly.
 			
