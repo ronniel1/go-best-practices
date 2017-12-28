@@ -11,7 +11,11 @@ names = [
 ]
 
 with open('README.md', 'w') as readme:
-    toc = ['# TOC\n\n']
+    toc = [
+        '# Stratoscale Go Best Practices\n\n',
+        'Here is a link to the [discussion video](https://stratoscale.zoom.us/recording/play/142yuukXBZ3hXGKyZG6dHLe6iovcQpQZE7TtM1CsgqTFyTo4aqY_oBa5mJmepq7N?autoplay=true).\n\n',
+        '# TOC\n\n',
+    ]
     for name in names:
         toc.append('* [{name}](#{link})\n'.format(link=name.lower().replace(' ', '-'), name=name))
     toc.append('\n\n')
