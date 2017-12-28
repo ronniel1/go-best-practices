@@ -16,7 +16,7 @@ echo "" >> ${readme}
 for chapter in ${files}
 do
 	echo "
-## ${chapter}
+# ${chapter}
 " >> ${readme}
 	cat ${chapter} >> ${readme}
 done

@@ -9,7 +9,7 @@
 * [chapters/70_3rd_party_pkgs.md](#chapters/70_3rd_party_pkgs.md)
 
 
-## chapters/00_main.md
+# chapters/00_main.md
 
 Usually the main package will be in path `cmd/`. A file `cmd/main.go` will contain the execution of the service,
 It consists of:
@@ -75,7 +75,7 @@ func main() {
 	m2.DoSomething()
 }
 ```
-## chapters/10_unit.md
+# chapters/10_unit.md
 
 Unit is a part of your application that responsible to do something.
 It holds state (or may be stateless), and exposes some functionality (its behavior).
@@ -132,7 +132,7 @@ func New(c Config) (API, error) {
 }
 ```
 
-## chapters/20_unittests.md
+# chapters/20_unittests.md
 
 For each public module function, we usually want to create a unittest, that tests all the flows in the function code.
 
@@ -218,7 +218,7 @@ func TestModule_Func1(testing *t.T) {
 }
 ```
 
-## chapters/30_unit_mocks.md
+# chapters/30_unit_mocks.md
 
 Each unit should expose it's mocking object.
 
@@ -263,7 +263,7 @@ assert.Equal(t, want, got)
 u.AssertExpectations(t)
 ```
 
-## chapters/40_logging.md
+# chapters/40_logging.md
 
 We use structured logging.
 Our library logger github.com/Stratoscale/golib/log wraps [logrus](https://github.com/sirupsen/logrus) logger.
@@ -314,7 +314,7 @@ if err != nil {
 }
 ```
 
-## chapters/50_flow.md
+# chapters/50_flow.md
 
 ### Avoid nested error handling
 
@@ -396,7 +396,7 @@ games2.Tetris.Play()    // :)
 ```
 
 
-## chapters/60_naming.md
+# chapters/60_naming.md
 
 ### Good names are:
 - Consistent (easy to guess),
@@ -531,7 +531,7 @@ func UserIDByEmail(ctx context.Context, email string) (int64, error) {}
 
 
 
-## chapters/70_3rd_party_pkgs.md
+# chapters/70_3rd_party_pkgs.md
 
 ## A list of packages we widly use:
 
