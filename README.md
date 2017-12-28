@@ -47,35 +47,43 @@ We use the [envconfig](https://github.com/kelseyhightower/envconfig) package.
 
 Main principles:
 
-* Dependencies injection - inject clients into the program componenets.
-  Good for unittesting of each module.
+* Dependencies injection - inject clients into the program components.
+  Good for unittesting of each unit.
 * `failOnError`: when main function gets an error, it should fail, the orchestrator will re-run it.
 
 ```go
+
+var log = log.New('my-application')
+
 func main() {
-	log := log.New()
-	
 	c1 = client2.Init()
 	c2 = client2.Init(options.VirtualIP)
 	
 	...
 	
-	m1, err = module1.New(module1.Config{
-		Client1: client1,
-		Client2: client2,
-		Log: log.With("pkg", "module1"),
+	u1, err = unit1.New(unit1.Config{
+		Client1: c1,
+		Client2: c2,
+		Log: log.With("pkg", "unit1"),
   	})
-	failOnError(err, "initializing module1")
+	failOnError(err, "initializing unit1")
 	
-	m2, err := module2.New(module2.Config{
-		Client2: client2,
-		Log: log.With("pkg", "module2"),
+	u2, err := unit2.New(unit2.Config{
+		Client2: c2,
+		Log: log.With("pkg", "unit2"),
   	})
-	failOnError(err, "initializing module2")
+	failOnError(err, "initializing unit2")
 	...
 	
-	m1.DoSomething()
-	m2.DoSomething()
+	u1.DoSomething()
+	u2.DoSomething()
+}
+
+func failOnError(err error, msg string) {
+	if err == nil {
+		return
+	}
+	log.WithError(err).Fatal(msg)  // causes the program to exit
 }
 ```
 
@@ -130,7 +138,7 @@ func New(c Config) (API, error) {
 	}
 	// Return the constructed type
 	return &unit{
-		Config: Config
+		Config: c,
 		blocks: make(chan uint),
 	}, nil
 }
@@ -139,18 +147,19 @@ func New(c Config) (API, error) {
 
 # Unittests
 
-For each public module function, we usually want to create a unittest, that tests all the flows in the function code.
+For each public unit function, we usually want to create a unittest, that tests all the flows in the function code.
 
 * Table driven tests
-* All module dependencies are mocks
+* All unit dependencies are mocks
 
 a unittest for `Func1(arg1 string, arg2 int) (*Result, error)` will look like:
 
 ```go
-func TestModule_Func1(testing *t.T) {
+func TestUnit_Func1(t *testing.T) {
 	t.Parallel()
 	
 	tests = []struct{
+		name string // name for test case
 		arg1 string
 		arg2 int
 		want *Result
@@ -159,12 +168,13 @@ func TestModule_Func1(testing *t.T) {
 	}{
 		{
 			// test 1
+			name: "simple input",
 			arg1: "a",
 			arg2: 1,
 			want: &Result{Concat: "a1"},
 			wantErr: false,
 			prepare: func(c1 *client1.Mock, c2 *client2.Mock) {
-				// here we prepare the mocks that the module are dependent on.
+				// here we prepare the mocks that the unit are dependent on.
 				c1.On("Check", mock.Anything).Return(nil).Once()
 				c2.On("Add", "a", 1).Return("a1", nil).Once()
 				// ...
@@ -196,8 +206,8 @@ func TestModule_Func1(testing *t.T) {
 				log.Out = ioutil.Discard
 			}
 			
-			// create Module
-			m, err := New(&Config{
+			// create unit
+			u, err := New(&Config{
 				Log:     log,
 				Client1: c1,
 				Client2: c2,
@@ -205,7 +215,7 @@ func TestModule_Func1(testing *t.T) {
 			require.Nil(t, err) // notice require and not assert - will fail the test immediatly.
 			
 			// run the tested function
-			got, err := m.Func1(tt.arg1, tt.arg2)
+			got, err := u.Func1(tt.arg1, tt.arg2)
 			
 			// assert results expectations
 			if tt.wantErr {

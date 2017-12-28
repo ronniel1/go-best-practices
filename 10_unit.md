@@ -47,7 +47,7 @@ func New(c Config) (API, error) {
 	}
 	// Return the constructed type
 	return &unit{
-		Config: Config
+		Config: c,
 		blocks: make(chan uint),
 	}, nil
 }

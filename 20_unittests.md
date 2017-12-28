@@ -1,15 +1,16 @@
-For each public module function, we usually want to create a unittest, that tests all the flows in the function code.
+For each public unit function, we usually want to create a unittest, that tests all the flows in the function code.
 
 * Table driven tests
-* All module dependencies are mocks
+* All unit dependencies are mocks
 
 a unittest for `Func1(arg1 string, arg2 int) (*Result, error)` will look like:
 
 ```go
-func TestModule_Func1(testing *t.T) {
+func TestUnit_Func1(t *testing.T) {
 	t.Parallel()
 	
 	tests = []struct{
+		name string // name for test case
 		arg1 string
 		arg2 int
 		want *Result
@@ -18,12 +19,13 @@ func TestModule_Func1(testing *t.T) {
 	}{
 		{
 			// test 1
+			name: "simple input",
 			arg1: "a",
 			arg2: 1,
 			want: &Result{Concat: "a1"},
 			wantErr: false,
 			prepare: func(c1 *client1.Mock, c2 *client2.Mock) {
-				// here we prepare the mocks that the module are dependent on.
+				// here we prepare the mocks that the unit are dependent on.
 				c1.On("Check", mock.Anything).Return(nil).Once()
 				c2.On("Add", "a", 1).Return("a1", nil).Once()
 				// ...
@@ -55,8 +57,8 @@ func TestModule_Func1(testing *t.T) {
 				log.Out = ioutil.Discard
 			}
 			
-			// create Module
-			m, err := New(&Config{
+			// create unit
+			u, err := New(&Config{
 				Log:     log,
 				Client1: c1,
 				Client2: c2,
@@ -64,7 +66,7 @@ func TestModule_Func1(testing *t.T) {
 			require.Nil(t, err) // notice require and not assert - will fail the test immediatly.
 			
 			// run the tested function
-			got, err := m.Func1(tt.arg1, tt.arg2)
+			got, err := u.Func1(tt.arg1, tt.arg2)
 			
 			// assert results expectations
 			if tt.wantErr {

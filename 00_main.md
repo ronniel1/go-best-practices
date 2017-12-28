@@ -31,34 +31,42 @@ We use the [envconfig](https://github.com/kelseyhightower/envconfig) package.
 
 Main principles:
 
-* Dependencies injection - inject clients into the program componenets.
-  Good for unittesting of each module.
+* Dependencies injection - inject clients into the program components.
+  Good for unittesting of each unit.
 * `failOnError`: when main function gets an error, it should fail, the orchestrator will re-run it.
 
 ```go
+
+var log = log.New('my-application')
+
 func main() {
-	log := log.New()
-	
 	c1 = client2.Init()
 	c2 = client2.Init(options.VirtualIP)
 	
 	...
 	
-	m1, err = module1.New(module1.Config{
-		Client1: client1,
-		Client2: client2,
-		Log: log.With("pkg", "module1"),
+	u1, err = unit1.New(unit1.Config{
+		Client1: c1,
+		Client2: c2,
+		Log: log.With("pkg", "unit1"),
   	})
-	failOnError(err, "initializing module1")
+	failOnError(err, "initializing unit1")
 	
-	m2, err := module2.New(module2.Config{
-		Client2: client2,
-		Log: log.With("pkg", "module2"),
+	u2, err := unit2.New(unit2.Config{
+		Client2: c2,
+		Log: log.With("pkg", "unit2"),
   	})
-	failOnError(err, "initializing module2")
+	failOnError(err, "initializing unit2")
 	...
 	
-	m1.DoSomething()
-	m2.DoSomething()
+	u1.DoSomething()
+	u2.DoSomething()
+}
+
+func failOnError(err error, msg string) {
+	if err == nil {
+		return
+	}
+	log.WithError(err).Fatal(msg)  // causes the program to exit
 }
 ```
