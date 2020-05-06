@@ -12,7 +12,7 @@ names = [
 
 with open('README.md', 'w') as readme:
     toc = [
-        '# Stratoscale Go Best Practices\n\n',
+        '# Go Best Practices\n\n',
         'Here is a link to the [discussion video](https://drive.google.com/a/stratoscale.com/file/d/13qoSDfqmoEHpB9Xw_cP_dJv6NGuIdX3G/view?usp=sharing).\n\n'
         '# TOC\n\n',
     ]
