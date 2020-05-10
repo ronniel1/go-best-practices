@@ -7,6 +7,7 @@ Here is a link to the [discussion video](https://drive.google.com/a/stratoscale.
 * [Main](#main)
 * [Unit](#unit)
 * [Unittests](#unittests)
+* [Code coverage](#code-coverage)
 * [Unit mocks](#unit-mocks)
 * [Logging](#logging)
 * [Flow](#flow)
@@ -238,6 +239,30 @@ func TestUnit_Func1(t *testing.T) {
 ```
 
 
+# Code coverage
+
+Not required, but it's nice to know how to check your code coverage. Go have a builtin tools for code coverage [here](https://blog.golang.org/cover)
+Those tools can display coverage with a friendly web page.
+
+Store coverage output to file.
+```shell script
+go test -v -coverprofile=coverage.out
+```
+
+Display coverage in a browser.
+```shell script
+go tool cover -html=coverage.out
+```
+
+Single command that run the test show the coverage and clear the file for a specific directory.
+```shell script
+go test -v -coverprofile=coverage.out && go tool cover -html=coverage.out && rm coverage.out
+```
+
+`go test` have maybe options to run specific tests or multiple directories so this command can be used in various ways.
+
+
+
 # Unit mocks
 
 Each unit should expose it's mocking object.
@@ -286,15 +311,12 @@ u.AssertExpectations(t)
 
 # Logging
 
-We use structured logging.
-Our library logger github.com/Stratoscale/golib/log wraps [logrus](https://github.com/sirupsen/logrus) logger.
+We use structured logging using [logrus](https://github.com/sirupsen/logrus) logger.
 
 The logger is configured to write structured log (json) to a file, and human readable log to stdout.
 
-We want to get red of it. It wraps the logrus logger functionality, which is not needed. 
-Maybe leave only the basic configuration in the library.
-
 * Get logger by interfaces, not the concrete type.
+  When getting logger as an argument, or holding in in a structure, user the logrus.FieldLogger interface
 * Don't put everything in a key-value pairs, We prefer more informative messages, and 
   to use key-value for things that could be plotted into a graph.
   
@@ -306,34 +328,54 @@ Maybe leave only the basic configuration in the library.
   Things that are less good to be given in a key-value:
   - Arguments, configurations
   - Content of requests, files
-  
-### DON'T LOG ERROR AND THEN RETURN IT. Errors should be "treated once!"
+* Logger should be created and initialize in the begining of the ```main``` function
+  and should be passed to components as dependency injection.
+  Components should accept the FieldLogger as a parameter and store it in their internal structure, for later usage.
+  When passing a logger to a newly created component, we should pass a new FieldLogger with the key of 'pkg' which is assigned the package name:
+  ```go
+  c := NewComponent(log.WithField("pkg", <pkg-name>), ...)
+  ```
+* When using the logger from a method that gets a ```Context```, the logger should be   enriched by the data in the context using the functionality from our internal [log  helper package](github.com/filanov/bm-inventory/pkg/log), as follows:
+  ```go
+  import (
+    logutil "github.com/filanov/bm-inventory/pkg/log"
+  )
 
-Thats wrong:
+  ...
 
-```go
-if err != nil {
-	s.Log.WithError(err).Error("Failed!")
-	return err
-}
-```
+  func (i MyInterface) foo() {
+    log := logutil.FromContext(ctx, i.log)
+  }
+  ```
+  This enriches the logs with extra data from the context, such as request-id, if present
+* Errors should be logged only in 1 place
+  ### DON'T LOG ERROR AND THEN RETURN IT. Errors should be "treated once!"
 
-Either:
+  Thats wrong:
 
-```go
-if err != nil {
-	return fmt.Errorf("my function failed: %s", err)
-}
-```
+  ```go
+  if err != nil {
+	  s.Log.WithError(err).Error("Failed!")
+	  return err
+  }
+  ```
 
-Or:
+  Either:
 
-```go
-if err != nil {
-	s.Log.WithError(err).Error("Failed!")
-	return nil
-}
-```
+  ```go
+  if err != nil {
+	  return fmt.Errorf("my function failed: %s", err)
+  }
+  ```
+
+  Or:
+
+  ```go
+  if err != nil {
+	  s.Log.WithError(err).Error("Failed!")
+	  return nil
+  }
+  ```
 
 
 # Flow
