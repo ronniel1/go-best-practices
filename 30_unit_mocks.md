@@ -1,13 +1,12 @@
-Each unit should expose it's mocking object.
+We use [golang/mock](https://github.com/golang/mock).
 
-We use [testify/mock](https://github.com/stretchr/testify#mock-package).
-
-A usefull tool that can be applied with the `go generate` command is the [mockery tool](https://github.com/vektra/mockery).
+A Useful tool that can be applied with the `go generate` command is the
+[mockgen](https://github.com/golang/mock#running-mockgen).
 
 Just add above each interface that the unit expose the `go:generate` comment:
 
 ```go
-//go:generate mockery -name API -inpkg
+//go:generate mockgen -package=<package-name> -destination mock_api.go . API
 
 // API is ....
 type API interface {
@@ -20,23 +19,34 @@ This will generate a file named mock_API.go with a struct `MockAPI`, which is ex
 Other packages which use the `unit.API` interface can use this mock in their unittests:
 
 ```go
-u1 := new(unit1.MockAPI)
-u1.On("Func1").Return().Once()
+ctrl := gomock.NewController(GinkgoT())
+u1 := util.NewMockAPI(ctrl)
+u1.EXPECT.Func1.Return().Times(1)
 // ...
-u1.AssertExpectations(t)
+ctrl.Finish()
 ```
 Since we are using "dependency injection", another unit (`unit2`) gets `unit1` in it's config, and in it's unittests
 it could get a mock:
 
 In `unit2` package:
 ```go
-u1 := new(unit1.MockAPI)
-u1.On("Func1").Return().Once()
+ctrl := gomock.NewController(GinkgoT())
+u1 := util.NewMockAPI(ctrl)
+u1.EXPECT.Func1.Return().Times(1)
 
 u2 := New(Config{U1: u1})
 
 got := u2.Func1()
 assert.Equal(t, want, got)
 
-u.AssertExpectations(t)
+ctrl.Finish()
+```
+
+Mock third party interface can be done as part of your makefile
+
+```makefile
+generate:
+    mockgen -destination externalmocks/mock_<filename>.go github.com/<repo>/<dir1>/<dir2>/<package> <interface>
+    # example:
+    mockgen -package=mockinstaller -destination externalmocks/installer/mock_installer.go github.com/filanov/bm-inventory/client/installer API
 ```
